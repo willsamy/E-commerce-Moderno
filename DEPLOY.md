@@ -31,7 +31,9 @@ Este guia fornece instruções passo a passo para fazer o deploy do E-commerce M
 4. Selecione a branch `clean-main`
 
 ### 2. Configurar Variáveis de Ambiente
-Na seção "Environment Variables" do projeto na Vercel, adicione:
+Na seção "Environment Variables" do projeto na Vercel, adicione **EXATAMENTE** estas variáveis:
+
+> ⚠️ **IMPORTANTE**: Use exatamente estes nomes de variáveis. O sistema não aceita nomes diferentes.
 
 #### Configurações Básicas
 ```env
@@ -53,6 +55,8 @@ STRIPE_PUBLIC_KEY=pk_live_sua_chave_publica_aqui
 STRIPE_SECRET_KEY=sk_live_sua_chave_secreta_aqui
 STRIPE_WEBHOOK_SECRET=whsec_seu_webhook_secret_aqui
 ```
+
+> 📝 **Nota**: Não use "Secrets" da Vercel, apenas "Environment Variables" normais.
 
 ### 3. Configurar Webhook do Stripe
 1. Acesse o [Dashboard do Stripe](https://dashboard.stripe.com/webhooks)
@@ -130,6 +134,19 @@ vercel rollback [deployment-url]
 ## 🛠️ Troubleshooting
 
 ### Problemas Comuns
+
+#### Erro: "Environment Variable references Secret which does not exist"
+```bash
+# SOLUÇÃO: Este erro ocorre quando o vercel.json usa "@secret_name" ao invés de "$VARIABLE_NAME"
+# ✅ CORRETO: "$DATABASE_URL" (variável de ambiente)
+# ❌ ERRADO: "@database_url" (secret que não existe)
+
+# Verificar se o vercel.json usa a sintaxe correta:
+# "DATABASE_URL": "$DATABASE_URL"
+# 
+# E configurar as variáveis no dashboard da Vercel como "Environment Variables", 
+# NÃO como "Secrets"
+```
 
 #### Build Falha
 ```bash
