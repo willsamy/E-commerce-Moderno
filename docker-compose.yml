@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: ecomercepro-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecomercepro
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ecomercepro"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ecomercepro-web
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: 8180
+      DATABASE_URL: postgres://postgres:postgres@db:5432/ecomercepro
+      NEXTAUTH_URL: http://localhost:8180
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-changeme-nextauth-secret}
+      APP_BASE_URL: http://localhost:8180
+    ports:
+      - "8180:8180"
+    command: [ "sh", "-c", "npm run db:migrate && npm run db:seed && npm run start" ]
+
+volumes:
+  db_data:
