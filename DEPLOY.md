@@ -35,6 +35,8 @@ Na seção "Environment Variables" do projeto na Vercel, adicione **EXATAMENTE**
 
 > ⚠️ **IMPORTANTE**: Use exatamente estes nomes de variáveis. O sistema não aceita nomes diferentes.
 
+> 🔥 **CRÍTICO**: Você DEVE configurar o `DATABASE_URL` primeiro! Sem ele, o deploy falhará.
+
 #### Configurações Básicas
 ```env
 # URL base da aplicação
@@ -44,8 +46,8 @@ APP_BASE_URL=https://seu-projeto.vercel.app
 NEXTAUTH_URL=https://seu-projeto.vercel.app
 NEXTAUTH_SECRET=seu_nextauth_secret_super_seguro_aqui
 
-# Banco de dados
-DATABASE_URL=sua_database_url_aqui
+# Banco de dados (OBRIGATÓRIO!)
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 ```
 
 #### Configurações do Stripe
@@ -134,6 +136,26 @@ vercel rollback [deployment-url]
 ## 🛠️ Troubleshooting
 
 ### Problemas Comuns
+
+#### Erro: "the URL must start with the protocol postgresql:// or postgres://"
+```bash
+# SOLUÇÃO: Este erro ocorre quando DATABASE_URL não está configurada ou está incorreta
+# 
+# 1. VERIFICAR se você configurou DATABASE_URL no dashboard da Vercel
+# 2. FORMATO CORRETO para PostgreSQL:
+#    DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
+#    ou
+#    DATABASE_URL=postgres://username:password@host:port/database?sslmode=require
+#
+# 3. Para Vercel Postgres:
+#    - Vá em Storage → Create Database → Postgres
+#    - Copie a connection string gerada
+#    - Cole como DATABASE_URL nas Environment Variables
+#
+# 4. Para PlanetScale (MySQL):
+#    - Use: DATABASE_URL=mysql://username:password@host:port/database?sslaccept=strict
+#    - Mas você precisará alterar o provider no schema.prisma para "mysql"
+```
 
 #### Erro: "Environment Variable references Secret which does not exist"
 ```bash
