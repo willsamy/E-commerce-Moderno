@@ -2,6 +2,108 @@
 
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
+## [24 de Janeiro de 2025]
+
+### ✅ Configuração de Banco Local com IP Público
+- **Verificado**: PostgreSQL Docker já configurado para conexões externas (`listen_addresses = '*'`)
+- **Testado**: Conexão externa funcionando com `postgresql://postgres:postgres@200.1.219.226:5433/ecomercepro?sslmode=disable`
+- **Documentado**: Adicionada Opção 2 no DEPLOY.md para uso de banco local com IP público
+- **Requisitos confirmados**:
+  - Container `ecomercepro-db` rodando na porta 5433:5432
+  - PostgreSQL 16.9 acessível externamente
+  - Configuração `pg_hba.conf` permite conexões externas com `scram-sha-256`
+
+### 🔧 Correção do Erro P1012 do Prisma
+- **Problema**: Script `vercel-build` executava `prisma migrate deploy` durante build
+- **Solução**: Removido `prisma migrate deploy` do script `vercel-build`
+- **Configuração atual**: `vercel-build: "prisma generate && next build"`
+- **Adicionado**: Script `vercel-postbuild` para executar migrações após o build
+- **Status**: ⚠️ **ERRO PERSISTE** - Logs de build ainda mostram execução de `prisma migrate deploy`
+
+### 📚 Melhorias na Documentação
+- **Atualizado**: DEPLOY.md com instruções detalhadas para configuração do banco
+- **Adicionado**: Seção específica para uso de banco local com Docker
+- **Incluído**: Comandos de teste de conexão externa
+- **Documentado**: Requisitos de firewall e configuração de rede
+
+### 🚨 Próximos Passos (URGENTE)
+1. **Verificar correções no repositório remoto** - Script `vercel-build` pode não estar atualizado no GitHub
+2. **Configurar DATABASE_URL na Vercel** - Usar `postgresql://postgres:postgres@200.1.219.226:5433/ecomercepro?sslmode=disable`
+3. **Testar deploy** - Verificar se erro P1012 foi resolvido com banco local
+
+---
+
+## [2025-01-24] - Correção Crítica do Erro P1012 do Prisma
+
+### Correções Críticas
+- **Erro P1012 Prisma**: Resolvido erro "the URL must start with the protocol postgresql:// or postgres://" durante build
+- **Script vercel-build**: Removido `prisma migrate deploy` para evitar erro durante build sem DATABASE_URL
+- **Script vercel-postbuild**: Adicionado para executar migrações após o build quando variáveis estão disponíveis
+- **Estratégia de Build**: Separada geração do cliente Prisma (build) das migrações (pós-build)
+
+### Melhorias na Documentação
+- **Passo a Passo DATABASE_URL**: Instruções detalhadas para criar banco Vercel Postgres
+- **Avisos Críticos**: Enfatizada necessidade de configurar variáveis ANTES do deploy
+- **Troubleshooting Atualizado**: Incluída nova estratégia de build na solução de problemas
+- **Guia Visual**: Adicionados emojis e formatação para destacar configurações obrigatórias
+
+### Mudanças Técnicas
+- **package.json**: `vercel-build` agora executa apenas `prisma generate && next build`
+- **package.json**: Novo script `vercel-postbuild` executa `prisma migrate deploy`
+- **DEPLOY.md**: Instruções completas para configurar Vercel Postgres
+- **Fluxo de Deploy**: Build → Environment Variables → Migrations
+
+### Status dos Testes
+- ✅ Scripts de build atualizados
+- ✅ Documentação completa atualizada
+- ✅ Estratégia de separação build/migrate implementada
+- ❌ **ERRO PERSISTENTE**: Build ainda falha com P1012 - script vercel-build no repositório remoto ainda contém `prisma migrate deploy`
+
+### Próximos Passos
+- 🔄 **URGENTE**: Verificar se as correções do package.json foram aplicadas no repositório remoto
+- 📋 Configurar DATABASE_URL no dashboard da Vercel antes do próximo deploy
+- 🧪 Testar deploy após correções serem aplicadas
+
+---
+
+## [2025-01-24] - Correção de Erro de DATABASE_URL no Deploy
+
+### Correções
+- **Erro Prisma P1012**: Resolvido erro "the URL must start with the protocol postgresql:// or postgres://"
+- **Documentação DEPLOY.md**: Adicionada seção específica de troubleshooting para erro de DATABASE_URL
+- **Configuração Crítica**: Enfatizada importância obrigatória de configurar DATABASE_URL antes do deploy
+- **Formato de URL**: Especificado formato correto para PostgreSQL: `postgresql://username:password@host:port/database?sslmode=require`
+- **Instruções Vercel Postgres**: Adicionadas instruções detalhadas para configurar banco na Vercel
+
+### Melhorias na Documentação
+- **Avisos Visuais**: Adicionados emojis e formatação para destacar configurações críticas
+- **Troubleshooting Expandido**: Nova seção com soluções para erros comuns de banco de dados
+- **Instruções Claras**: Passo a passo detalhado para configurar DATABASE_URL na Vercel
+
+### Status dos Testes
+- ✅ Configuração do vercel.json validada
+- ✅ Documentação de deploy atualizada
+- ⏳ Aguardando teste de deploy com DATABASE_URL configurada
+
+---
+
+## [2025-01-24] - Correção de Deploy na Vercel
+
+### Corrigido
+- **Erro crítico de deploy**: "Environment Variable references Secret which does not exist"
+- Configuração incorreta no `vercel.json` que usava `@secret_name` ao invés de `$VARIABLE_NAME`
+- Documentação atualizada com instruções claras sobre Environment Variables vs Secrets
+
+### Alterado
+- `vercel.json`: Alterado todas as referências de `@secret_name` para `$VARIABLE_NAME`
+- `DEPLOY.md`: Adicionado seção de troubleshooting específica para este erro
+- `DEPLOY.md`: Esclarecido que deve usar "Environment Variables" e não "Secrets" da Vercel
+
+### Detalhes Técnicos
+- ✅ `DATABASE_URL`: `"$DATABASE_URL"` (correto)
+- ❌ `DATABASE_URL`: `"@database_url"` (incorreto - causava o erro)
+- Todas as 6 variáveis de ambiente foram corrigidas no `vercel.json`
+
 ## [2025-01-24] - Preparação para Deploy na Vercel
 
 ### Adicionado

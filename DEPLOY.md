@@ -17,7 +17,29 @@ Este guia fornece instruções passo a passo para fazer o deploy do E-commerce M
 3. Escolha um nome para o banco
 4. Copie a `DATABASE_URL` gerada
 
-### Opção 2: PlanetScale
+### Opção 2: Banco Local com IP Público (Docker)
+Se você já tem um banco PostgreSQL rodando localmente com Docker e IP público:
+
+1. **Verificar se o banco está acessível externamente**:
+   ```bash
+   # Testar conexão externa
+   docker run --rm postgres:16-alpine psql "postgresql://postgres:postgres@SEU_IP_PUBLICO:5433/ecomercepro?sslmode=disable" -c "SELECT 'Conexão OK!' as status;"
+   ```
+
+2. **Configurar DATABASE_URL**:
+   ```env
+   DATABASE_URL=postgresql://postgres:postgres@SEU_IP_PUBLICO:5433/ecomercepro?sslmode=disable
+   ```
+
+3. **Requisitos**:
+   - IP público estático ou dinâmico atualizado
+   - PostgreSQL configurado para aceitar conexões externas (`listen_addresses = '*'`)
+   - Porta 5433 liberada no firewall/roteador
+   - Container Docker rodando com mapeamento de porta `-p 5433:5432`
+
+> ⚠️ **Importante**: Esta opção requer que seu IP público seja acessível e que o banco esteja sempre online durante o uso da aplicação na Vercel.
+
+### Opção 3: PlanetScale
 1. Crie uma conta no [PlanetScale](https://planetscale.com)
 2. Crie um novo banco de dados
 3. Obtenha a connection string no formato MySQL
