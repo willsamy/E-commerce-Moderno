@@ -37,6 +37,8 @@ Na seção "Environment Variables" do projeto na Vercel, adicione **EXATAMENTE**
 
 > 🔥 **CRÍTICO**: Você DEVE configurar o `DATABASE_URL` primeiro! Sem ele, o deploy falhará.
 
+> 🚨 **ATENÇÃO**: Configure as variáveis ANTES de fazer o deploy. O build precisa das variáveis para funcionar.
+
 #### Configurações Básicas
 ```env
 # URL base da aplicação
@@ -49,6 +51,24 @@ NEXTAUTH_SECRET=seu_nextauth_secret_super_seguro_aqui
 # Banco de dados (OBRIGATÓRIO!)
 DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 ```
+
+#### Como Configurar DATABASE_URL na Vercel:
+
+1. **Criar Banco Vercel Postgres**:
+   - No dashboard da Vercel, vá em **Storage**
+   - Clique em **Create Database**
+   - Selecione **Postgres**
+   - Escolha um nome para o banco
+   - Clique em **Create**
+
+2. **Copiar Connection String**:
+   - Após criar o banco, vá na aba **Settings**
+   - Copie a **Connection String** (formato: `postgresql://...`)
+
+3. **Configurar Environment Variable**:
+   - Vá em **Settings** → **Environment Variables**
+   - Adicione: `DATABASE_URL` = `sua_connection_string_aqui`
+   - **NÃO** use "Secrets", apenas "Environment Variables"
 
 #### Configurações do Stripe
 ```env
@@ -155,6 +175,10 @@ vercel rollback [deployment-url]
 # 4. Para PlanetScale (MySQL):
 #    - Use: DATABASE_URL=mysql://username:password@host:port/database?sslaccept=strict
 #    - Mas você precisará alterar o provider no schema.prisma para "mysql"
+#
+# 5. IMPORTANTE: Configure as variáveis ANTES de fazer o deploy!
+#    O build agora executa apenas 'prisma generate && next build'
+#    As migrações são executadas após o build com 'vercel-postbuild'
 ```
 
 #### Erro: "Environment Variable references Secret which does not exist"
