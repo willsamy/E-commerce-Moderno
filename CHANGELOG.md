@@ -136,19 +136,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 - ✅ Documentação de deploy criada
 - 🚀 Pronto para deploy na Vercel
 
-## [2025-01-24] - Ajustes para Deploy Funcional na Vercel
+## [2025-01-24] - Análise de Logs de Build e Correções para Erro P1012 Persistente
 
-### Adicionado
-- Ajustes no arquivo .env local para deploy na Vercel:
-  - DATABASE_URL atualizada com IP público correto (200.1.219.226:5433), protocolo postgresql:// e sslmode=disable
-  - APP_BASE_URL e NEXTAUTH_URL configurados para o domínio da Vercel (https://e-commerce-moderno.vercel.app)
-  - NEXTAUTH_SECRET gerado novo e seguro para produção
+### Análise dos Logs
+- **Commit Clonado**: 4662577 (verificar se é o mais recente; local está em 2f0a176)
+- **Erro Principal**: P1012 - DATABASE_URL não começa com `postgresql://` ou `postgres://` durante `prisma migrate deploy`
+- **Outros Avisos**: Depreciações em rimraf, inflight, glob, eslint; atualização disponível para Prisma 6.16.2
+- **Script Executado**: `vercel-build` inclui `prisma migrate deploy` (pode estar desatualizado no repo remoto)
 
-### Melhorado
-- Configurações de ambiente otimizadas para produção, facilitando cópia para dashboard da Vercel
-- Instruções para evitar erro P1012: Copiar vars do .env ajustado para Environment Variables na Vercel
+### Correções Sugeridas
+- **Verificar DATABASE_URL na Vercel**: Garanta que começa com `postgresql://` (ex: `postgresql://postgres:postgres@200.1.219.226:5433/ecomercepro?sslmode=disable`)
+- **Atualizar Repo**: Faça git pull e verifique se script `vercel-build` está sem `prisma migrate deploy`
+- **Atualizar Prisma**: Considere upgrade para v6.16.2 seguindo guia oficial
+- **Redeploy**: Após correções, redeploy manual na Vercel
 
 ### Status
-- ✅ .env ajustado localmente
-- ✅ Pronto para cópia para Vercel e novo deploy
-- ⏳ Aguardando configuração na Vercel para teste final
+- ❌ Erro persiste devido a formato inválido da URL
+- ✅ Análise completa realizada
+- ⏳ Aguardando confirmação do valor exato da DATABASE_URL na Vercel
